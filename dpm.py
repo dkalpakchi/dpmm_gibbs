@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # @Author: dmytro
 # @Date:   2017-01-02 21:00:09
-# @Last Modified by:   dmytro
-# @Last Modified time: 2017-01-03 16:33:05
+# @Last Modified by:   Dmytro Kalpakchi
+# @Last Modified time: 2017-01-03 16:54:43
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
@@ -31,11 +31,13 @@ class DPM(object):
 		self.__tau_sq = tau2
 		self.__D = mu.shape[0]
 		self.__N = x.shape[0]
-		self.__colors = np.array(['b', 'r', 'g', 'm', 'y', 'k', 'c'])
+		self.__colors = np.array(['b', 'r', 'g', 'm', 'y', 'k', 'c', '#b89d00'])
+		self.__burnin = 0.1 * numiter
 
 	def gibbs_sample(self):
 		plt.scatter(self.__data[:,0], self.__data[:,1], c=self.__colors[self.__clusters])
 		plt.show()
+		K_stats = []
 		for it in xrange(self.__iter):
 			points = range(self.__N)
 			np.random.shuffle(points)
@@ -68,7 +70,16 @@ class DPM(object):
 					self.__K -= 1
 					ind = np.argwhere(self.__clusters > cluster)
 					self.__clusters[ind] -= 1
+			if it > self.__burnin:
+				K_stats.append(self.__K)
 			print "Iteration {} has finished with {} clusters".format(it, self.__K)
 		print [np.argwhere(self.__clusters == k).size for k in xrange(self.__K)]
 		plt.scatter(self.__data[:,0], self.__data[:,1], c=self.__colors[self.__clusters])
+		plt.show()
+
+		plt.xlabel("# of clusters")
+		plt.ylabel("posterior probability")
+		a, b = min(K_stats) - 1, max(K_stats) + 1
+		bins = b - a
+		plt.hist(K_stats, bins=bins, range=[a,b], normed=1, align='left', facecolor='green', alpha=0.75)
 		plt.show()
