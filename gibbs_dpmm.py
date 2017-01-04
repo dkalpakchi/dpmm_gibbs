@@ -2,7 +2,7 @@
 # @Author: dmytro
 # @Date:   2017-01-02 10:33:56
 # @Last Modified by:   Dmytro Kalpakchi
-# @Last Modified time: 2017-01-03 16:57:08
+# @Last Modified time: 2017-01-04 22:25:35
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,7 +11,7 @@ from dpm import DPM
 
 # data generation params
 D = 2
-K_genuine = 7
+K_genuine = 3
 colors = np.array(['b', 'r', 'g', 'm', 'y', 'k', 'c'])
 N = 100
 mu = np.array([0, 0.5])
@@ -25,11 +25,13 @@ theta_k = np.array([np.random.multivariate_normal(mu, tau_sq * np.eye(D)) for _ 
 x = np.array([np.random.multivariate_normal(th, sigma_sq * np.eye(D)) for th in theta_k[true_z]])
 
 plt.scatter(x[:,0], x[:,1], c=c)
-plt.show()
+plt.savefig("gibbs_genuine.png")
 
 # hyperparameters
 alpha = 1.0
 K = 1
+
 z = np.arange(N) % K
-dpm = DPM(x, z, K, mu, sigma_sq, tau_sq, alpha, numiter=200)
+
+dpm = DPM(x, z, K, mu, sigma_sq, tau_sq, alpha)
 dpm.gibbs_sample()
